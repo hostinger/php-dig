@@ -16,10 +16,13 @@
   },
   "autoload": {
     "psr-4": {
-      "Hostinger\\": "src/"
+      "Hostinger\\": "src/Hostinger"
     }
   },
   "autoload-dev": {
+    "psr-4": {
+      "Hostinger\\": "src/Hostinger"
+    },
     "classmap": [
       "tests/"
     ]
