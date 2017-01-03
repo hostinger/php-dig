@@ -79,6 +79,13 @@ class DigClient implements LoggerAwareInterface
             return 'disabled_function_exec';
         }
 
+        $lines   = [];
+        $command = 'dig -v 2>&1 | grep "not found" ';
+        exec($command, $lines);
+        if (!empty($lines)) {
+            return 'dig not found';
+        }
+
         return true;
     }
 }

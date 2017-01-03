@@ -4,14 +4,14 @@ namespace Hostinger;
 
 class RecordTypeFactory
 {
-    private $dns_types = [
+    private $dnsTypes = [
         DNS_MX    => 'MX',
         DNS_CNAME => 'CNAME',
     ];
 
     public function make($dns_type)
     {
-        $class = '\\Hostinger\\RecordType\\' . ucfirst(strtolower($this->dns_types[$dns_type]));
+        $class = '\\Hostinger\\RecordType\\' . ucfirst(strtolower($this->dnsTypes[$dns_type]));
         if (!class_exists($class)) {
             return null;
         }
