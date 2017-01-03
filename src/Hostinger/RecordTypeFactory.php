@@ -7,6 +7,7 @@ class RecordTypeFactory
     private $dnsTypes = [
         DNS_MX    => 'MX',
         DNS_CNAME => 'CNAME',
+        DNS_NS    => 'NS',
     ];
 
     public function make($dns_type)
