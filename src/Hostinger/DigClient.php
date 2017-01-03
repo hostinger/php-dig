@@ -17,18 +17,21 @@ class DigClient implements LoggerAwareInterface
 
     public function getRecord($domain, $type)
     {
-        $recordType = (new RecordTypeFactory())->make($type);
+        $recordTypeFactory = new RecordTypeFactory();
+        $recordType        = $recordTypeFactory->make($type);
         if (is_null($recordType)) {
-            $this->logger->warning('Unsupported DNS type', ['domain' => $domain, 'type' => $type]);
+            $this->logger->warning('Unsupported DNS type',
+                ['domain' => $domain, 'type' => $recordTypeFactory->convertDnsTypeToString($type)]);
             return $this->fallback($domain, $type);
         }
 
         if ($errorCode = $this->execEnabled() !== true) {
-            $this->logger->warning('EXEC disabled', ['domain' => $domain, 'type' => $type, 'error' => $errorCode]);
+            $this->logger->warning('EXEC disabled',
+                ['domain' => $domain, 'type' => $recordType->getType(), 'error' => $errorCode]);
             return $this->fallback($domain, $type);
         }
 
-        $this->logger->debug('execute dig', ['domain' => $domain, 'type' => $type]);
+        $this->logger->debug('execute dig', ['domain' => $domain, 'type' => $recordType->getType()]);
         return (new ExecuteDigCommand())->execute($domain, $recordType);
     }
 
