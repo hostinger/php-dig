@@ -13,6 +13,7 @@ class ClientTest extends \PHPUnit\Framework\TestCase
     {
         return [
             ['hostingermail.com', DNS_MX],
+            ['hostingermail.com', DNS_NS],
             ['ghs.google.com', DNS_CNAME],
         ];
     }
@@ -29,6 +30,11 @@ class ClientTest extends \PHPUnit\Framework\TestCase
 
         $expected = dns_get_record($domain, $type);
 
-        $this->assertEmpty(array_diff_key($result, $expected));
+        $resultExpecteKeySame = array_diff_key($expected[0], $result[0]);
+        $this->assertEmpty($resultExpecteKeySame, json_encode($resultExpecteKeySame));
+
+        $this->assertEquals($expected[0]['host'], $result[0]['host']);
+        $this->assertEquals($expected[0]['class'], $result[0]['class']);
+        $this->assertEquals($expected[0]['type'], $result[0]['type']);
     }
 }

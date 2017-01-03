@@ -2,12 +2,12 @@
 
 namespace Hostinger\RecordType;
 
-class Cname implements RecordType
+class Ns implements RecordType
 {
     /**
      * Example of dig output
-     * dig +noall +answer CNAME ghs.google.com
-     * ghs.google.com.         46441   IN      CNAME   ghs.l.google.com.
+     * dig +noall +answer NS hostingermail.com
+     * hostingermail.com.      3599    IN      NS      ns56.domaincontrol.com.
      * @param array $lines
      * @return array
      */
@@ -33,7 +33,7 @@ class Cname implements RecordType
 
     public function getType()
     {
-        return 'CNAME';
+        return 'NS';
     }
 
 }

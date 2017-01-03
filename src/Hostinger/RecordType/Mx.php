@@ -22,7 +22,7 @@ class Mx implements RecordType
             }
 
             $output[] = [
-                'host'   => $recordProp[0],
+                'host'   => trim($recordProp[0], '\.'),
                 'ttl'    => $recordProp[1],
                 'class'  => $recordProp[2],
                 'type'   => $recordProp[3],
