@@ -27,7 +27,7 @@ class Mx implements RecordType
                 'class'  => $recordProp[2],
                 'type'   => $recordProp[3],
                 'pri'    => $recordProp[4],
-                'target' => $recordProp[5],
+                'target' => trim($recordProp[5], '\.'),
             ];
         }
         return $output;

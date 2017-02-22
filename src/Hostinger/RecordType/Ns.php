@@ -25,7 +25,7 @@ class Ns implements RecordType
                 'ttl'    => $recordProp[1],
                 'class'  => $recordProp[2],
                 'type'   => $recordProp[3],
-                'target' => $recordProp[4],
+                'target' => trim($recordProp[4], '\.'),
             ];
         }
         return $output;
