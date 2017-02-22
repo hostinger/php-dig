@@ -17,7 +17,7 @@ class ExecuteDigCommand
     {
         $lines   = [];
         $dnsType = strtoupper($recordType->getType());
-        $command = 'dig +noall +answer +time=' . escapeshellarg($this->timeout) . ' ' . escapeshellarg($dnsType) . ' ' . escapeshellarg($domain);
+        $command = 'dig @8.8.8.8 +noall +answer +time=' . escapeshellarg($this->timeout) . ' ' . escapeshellarg($dnsType) . ' ' . escapeshellarg($domain);
         exec($command, $lines);
         if (empty($lines)) {
             return [];
