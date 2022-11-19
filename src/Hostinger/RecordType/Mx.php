@@ -10,7 +10,7 @@ class Mx implements RecordType
      * hostingermail.com.      81657   IN      MX      50 ASPMX3.GOOGLEMAIL.com.
      * hostingermail.com.      81657   IN      MX      40 ASPMX2.GOOGLEMAIL.com.
      * @param array $lines
-     * @return array
+     * @return array<mixed>
      */
     public function transform(array $lines)
     {
@@ -37,5 +37,4 @@ class Mx implements RecordType
     {
         return 'MX';
     }
-
 }

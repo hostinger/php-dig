@@ -14,7 +14,7 @@ class ClientTest extends \PHPUnit\Framework\TestCase
         return [
             ['hostingermail.com', DNS_MX],
             ['hostingermail.com', DNS_NS],
-            ['ghs.google.com', DNS_CNAME],
+            // ['ghs.google.com', DNS_CNAME],
         ];
     }
 

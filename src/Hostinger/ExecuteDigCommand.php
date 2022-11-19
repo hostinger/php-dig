@@ -13,15 +13,27 @@ class ExecuteDigCommand
         $this->timeout = $value;
     }
 
-    public function execute($domain, RecordType $recordType)
-    {
+    /**
+     *
+     * @param string $domain
+     * @param RecordType $recordType
+     * @param string $serverIp
+     * @return array<mixed>
+     */
+    public function execute(
+        string $domain,
+        RecordType $recordType,
+        string $serverIp = '8.8.8.8'
+    ): array {
         $lines   = [];
         $dnsType = strtoupper($recordType->getType());
-        $command = 'dig @8.8.8.8 +noall +answer +time=' . escapeshellarg($this->timeout) . ' ' . escapeshellarg($dnsType) . ' ' . escapeshellarg($domain);
+        $command = 'dig @'.$serverIp.' +noall +answer +time=' . escapeshellarg($this->timeout) . ' ' . escapeshellarg($dnsType) . ' ' . escapeshellarg($domain);
         exec($command, $lines);
+
         if (empty($lines)) {
             return [];
         }
+
         return $recordType->transform($lines);
     }
 }

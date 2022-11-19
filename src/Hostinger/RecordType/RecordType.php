@@ -2,7 +2,6 @@
 
 namespace Hostinger\RecordType;
 
-
 interface RecordType
 {
     /**
@@ -12,7 +11,7 @@ interface RecordType
 
     /**
      * @param array $lines
-     * @return array
+     * @return array<mixed>
      */
     public function transform(array $lines);
 }

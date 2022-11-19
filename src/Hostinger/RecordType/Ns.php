@@ -9,7 +9,7 @@ class Ns implements RecordType
      * dig +noall +answer NS hostingermail.com
      * hostingermail.com.      3599    IN      NS      ns56.domaincontrol.com.
      * @param array $lines
-     * @return array
+     * @return array<mixed>
      */
     public function transform(array $lines)
     {
@@ -35,5 +35,4 @@ class Ns implements RecordType
     {
         return 'NS';
     }
-
 }

@@ -19,15 +19,20 @@ class DigClient implements LoggerAwareInterface
     {
         $recordTypeFactory = new RecordTypeFactory();
         $recordType        = $recordTypeFactory->make($type);
+
         if (is_null($recordType)) {
-            $this->logger->warning('Unsupported DNS type',
-                ['domain' => $domain, 'type' => $recordTypeFactory->convertDnsTypeToString($type)]);
+            $this->logger->warning(
+                'Unsupported DNS type',
+                ['domain' => $domain, 'type' => $recordTypeFactory->convertDnsTypeToString($type)]
+            );
             return $this->fallback($domain, $type);
         }
 
         if ($errorCode = $this->execEnabled() !== true) {
-            $this->logger->warning('EXEC disabled',
-                ['domain' => $domain, 'type' => $recordType->getType(), 'error' => $errorCode]);
+            $this->logger->warning(
+                'EXEC disabled',
+                ['domain' => $domain, 'type' => $recordType->getType(), 'error' => $errorCode]
+            );
             return $this->fallback($domain, $type);
         }
 
@@ -59,8 +64,10 @@ class DigClient implements LoggerAwareInterface
         try {
             $output = dns_get_record($domain, $type);
         } catch (\ErrorException $errorException) {
-            $this->logger->critical('dns_get_record() query failed',
-                ['domain' => $domain, 'type' => $type, 'error' => $errorException->getMessage()]);
+            $this->logger->critical(
+                'dns_get_record() query failed',
+                ['domain' => $domain, 'type' => $type, 'error' => $errorException->getMessage()]
+            );
         }
 
         restore_error_handler();

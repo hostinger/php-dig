@@ -9,7 +9,7 @@ class Cname implements RecordType
      * dig +noall +answer CNAME ghs.google.com
      * ghs.google.com.         46441   IN      CNAME   ghs.l.google.com.
      * @param array $lines
-     * @return array
+     * @return array<mixed>
      */
     public function transform(array $lines)
     {
@@ -35,5 +35,4 @@ class Cname implements RecordType
     {
         return 'CNAME';
     }
-
 }
