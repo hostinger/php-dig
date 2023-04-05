@@ -18,12 +18,29 @@ class Client implements LoggerAwareInterface
     protected Closure $fallback;
 
     /**
-     * @param Closure|null $fallback Fallback to use when dig fails. Should take two arguments: domain and type.
+     * @param Closure|null $customFallback Fallback to use when dig fails. Should take two arguments: domain and type.
      */
-    public function __construct(Closure $fallback = null)
+    public function __construct(Closure $customFallback = null)
     {
         $this->logger = new NullLogger();
-        $this->fallback = $fallback ?? Closure::fromCallable([$this, 'defaultFallback']);
+        $this->fallback = $customFallback ?? Closure::fromCallable([$this, 'defaultFallback']);
+    }
+
+    /**
+     * @param Closure $fallback Fallback to use when dig fails. Should take two arguments: domain and type.
+     */
+    public function setFallback(Closure $fallback): void
+    {
+        $this->fallback = $fallback;
+    }
+
+    /**
+     * Resets fallback to default dns_get_record() call.
+     * @return void
+     */
+    public function resetFallback(): void
+    {
+        $this->fallback = Closure::fromCallable([$this, 'defaultFallback']);
     }
 
     /**
