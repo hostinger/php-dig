@@ -8,22 +8,17 @@ use Hostinger\Dig\RecordType\RecordType;
 
 class Command
 {
-    private int $timeout = 2;
-
-    public function setTimeout(int $value): Command
-    {
-        $this->timeout = $value;
-
-        return $this;
-    }
-
-    public function execute(string $domain, RecordType $recordType, string $dnsProvider = '8.8.8.8'): ?array
-    {
+    public function execute(
+        string $domain,
+        RecordType $recordType,
+        string $dnsProvider = '8.8.8.8',
+        int $timeout = 2
+    ): ?array {
         $dnsType = strtoupper($recordType->getType());
         $command = sprintf(
-            'dig @%s +noall +answer +time=%s %s %s',
+            'dig @%s +noall +answer +time=%u %s %s',
             escapeshellarg($dnsProvider),
-            escapeshellarg((string) $this->timeout),
+            $timeout,
             escapeshellarg($dnsType),
             escapeshellarg($domain)
         );

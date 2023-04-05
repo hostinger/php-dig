@@ -53,7 +53,7 @@ class Client implements LoggerAwareInterface
 
         $this->logger->debug('execute dig', ['domain' => $domain, 'type' => $recordType->getType()]);
 
-        return $this->command->setTimeout($timeout)->execute($domain, $recordType, $dnsProvider);
+        return $this->command->execute($domain, $recordType, $dnsProvider, $timeout);
     }
 
     /**
