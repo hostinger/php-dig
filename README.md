@@ -5,6 +5,25 @@
 
 It should drastically decrease time to get dns records, and lower failure errors like `dns_get_record(): A temporary server error occurred.`
 
+## Installation
+
+For now this package is not on [Packgist](https://packagist.org/), so you need to add it to your composer.json manually
+```json
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:hostinger/php-dig.git"
+        }
+    ]
+}
+```
+
+Install the latest version with
+```console
+$ composer require hostinger/php-dig
+```
+
 ## Usage
 
 ```php
