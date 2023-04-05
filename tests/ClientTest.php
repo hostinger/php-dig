@@ -1,31 +1,31 @@
 <?php
 
-class ClientTest extends \PHPUnit\Framework\TestCase
-{
-    public function testExecEnabled()
-    {
-        $client = new Hostinger\DigClient();
-        $result = $client->execEnabled();
-        $this->assertTrue($result, $result);
-    }
+declare(strict_types=1);
 
-    public function domainsAndTypesProvider()
+namespace Hostinger\Dig\Tests;
+
+use Hostinger\Dig\Client;
+use PHPUnit\Framework\TestCase;
+
+class ClientTest extends TestCase
+{
+    public function domainsAndTypesProvider(): array
     {
         return [
+            ['hostinger.com', DNS_A],
+            ['hostinger.com', DNS_AAAA],
             ['hostingermail.com', DNS_MX],
             ['hostingermail.com', DNS_NS],
-            ['ghs.google.com', DNS_CNAME],
         ];
     }
 
     /**
      * @dataProvider domainsAndTypesProvider
      */
-    public function testgetRecords($domain, $type)
+    public function testGetRecords($domain, $type): void
     {
-        $client = new Hostinger\DigClient();
+        $client = new Client();
         $result = $client->getRecord($domain, $type);
-        $this->assertTrue(is_array($result));
         $this->assertArrayHasKey(0, $result);
 
         $expected = dns_get_record($domain, $type);
@@ -36,5 +36,19 @@ class ClientTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected[0]['host'], $result[0]['host']);
         $this->assertEquals($expected[0]['class'], $result[0]['class']);
         $this->assertEquals($expected[0]['type'], $result[0]['type']);
+    }
+
+    public function testFallbacksToCustom(): void
+    {
+        $customRecord = [
+            'type' => 'CUSTOM',
+        ];
+        $client = new Client(function () use ($customRecord) {
+            return [$customRecord];
+        });
+
+        $result = $client->getRecord('hostinger.com', DNS_CAA);
+        $this->assertCount(1, $result);
+        $this->assertEquals('CUSTOM', $result[0]['type']);
     }
 }

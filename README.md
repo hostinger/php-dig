@@ -6,8 +6,20 @@
 It should drastically decrease time to get dns records, and lower failure errors like `dns_get_record(): A temporary server error occurred.`
 
 ## Installation
-Install the latest version with
 
+For now this package is not on [Packgist](https://packagist.org/), so you need to add it to your composer.json manually
+```json
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:hostinger/php-dig.git"
+        }
+    ]
+}
+```
+
+Install the latest version with
 ```console
 $ composer require hostinger/php-dig
 ```
@@ -15,7 +27,7 @@ $ composer require hostinger/php-dig
 ## Usage
 
 ```php
-$client = new Hostinger\DigClient();
+$client = new \Hostinger\Dig\Client();
 $result = $client->getRecord('hostinger.com', DNS_MX);
 ```
 
@@ -28,8 +40,9 @@ Package checks if it can run `exec` in server environment, otherwise it will fal
 
 ### DigClient implements LoggerAwareInterface
 You can set [logger](https://github.com/Seldaek/monolog/) to debug / log package activity
+
 ```php
-$client = new Hostinger\DigClient();
+$client = new \Hostinger\Dig\Client();
 $logger = new \Monolog\Logger\Logger('App');
 $logger->pushHandler(new StreamHandler('path/to/your.log'));
 $client->setLogger($logger);
@@ -39,7 +52,7 @@ $client->setLogger($logger);
 
 ### Requirements
 
-- php-dig client works with PHP 5.6 or above.
+- php-dig client works with PHP 8.0 or above.
 
 ### Submitting bugs and feature requests
 
