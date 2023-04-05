@@ -28,4 +28,26 @@ class RecordTypeFactory
             default => null,
         };
     }
+
+    static public function dnsTypeToName(int $type): string
+    {
+        return match ($type) {
+            DNS_A => 'A',
+            DNS_CAA => 'CAA',
+            DNS_NS => 'NS',
+            DNS_CNAME => 'CNAME',
+            DNS_SOA => 'SOA',
+            DNS_PTR => 'PTR',
+            DNS_HINFO => 'HINFO',
+            DNS_MX => 'MX',
+            DNS_TXT => 'TXT',
+            DNS_SRV => 'SRV',
+            DNS_NAPTR => 'NAPTR',
+            DNS_AAAA => 'AAAA',
+            DNS_A6 => 'A6',
+            DNS_ANY => 'ANY',
+            DNS_ALL => 'ALL',
+            default => 'UNKNOWN',
+        };
+    }
 }

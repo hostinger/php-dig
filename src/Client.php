@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Hostinger\Dig;
 
+use Closure;
 use ErrorException;
+use Hostinger\Dig\RecordType\RecordType;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -13,12 +15,20 @@ class Client implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    protected Command $command;
+    protected Closure|null $fallback = null;
 
     public function __construct()
     {
         $this->logger = new NullLogger();
-        $this->command = new Command();
+    }
+
+    /**
+     * Set custom fallback function. To reset it, pass null.
+     * @param Closure|null $fallback
+     */
+    public function setFallback(?Closure $fallback): void
+    {
+        $this->fallback = $fallback;
     }
 
     /**
@@ -36,7 +46,7 @@ class Client implements LoggerAwareInterface
         if (is_null($recordType)) {
             $this->logger->warning('Unsupported DNS type', [
                 'domain' => $domain,
-                'type' => $this->dnsTypeToName($type)
+                'type' => RecordTypeFactory::dnsTypeToName($type),
             ]);
             return $this->fallback($domain, $type);
         }
@@ -53,7 +63,7 @@ class Client implements LoggerAwareInterface
 
         $this->logger->debug('execute dig', ['domain' => $domain, 'type' => $recordType->getType()]);
 
-        return $this->command->execute($domain, $recordType, $dnsProvider, $timeout);
+        return $this->executeDig($domain, $recordType, $dnsProvider, $timeout);
     }
 
     /**
@@ -66,8 +76,12 @@ class Client implements LoggerAwareInterface
      * @return array
      * @throws ErrorException
      */
-    public function fallback(string $domain, int $type): array
+    protected function fallback(string $domain, int $type): array
     {
+        if ($this->fallback !== null) {
+            return ($this->fallback)($domain, $type);
+        }
+
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
             // error was suppressed with the @-operator
             if (0 === error_reporting()) {
@@ -82,7 +96,7 @@ class Client implements LoggerAwareInterface
         } catch (ErrorException $errorException) {
             $this->logger->critical('dns_get_record() query failed', [
                 'domain' => $domain,
-                'type' => $this->dnsTypeToName($type),
+                'type' => RecordTypeFactory::dnsTypeToName($type),
                 'error' => $errorException->getMessage(),
             ]);
         } finally {
@@ -96,7 +110,7 @@ class Client implements LoggerAwareInterface
      * Check if system allowed to execute commands. Return true or string with error message
      * @return bool|string
      */
-    public function execEnabled(): bool|string
+    protected function execEnabled(): bool|string
     {
         if (!function_exists('exec')) {
             return 'missing_function_exec';
@@ -117,25 +131,26 @@ class Client implements LoggerAwareInterface
         return true;
     }
 
-    private function dnsTypeToName(int $type): string
-    {
-        return match ($type) {
-            DNS_A => 'A',
-            DNS_CAA => 'CAA',
-            DNS_NS => 'NS',
-            DNS_CNAME => 'CNAME',
-            DNS_SOA => 'SOA',
-            DNS_PTR => 'PTR',
-            DNS_HINFO => 'HINFO',
-            DNS_MX => 'MX',
-            DNS_TXT => 'TXT',
-            DNS_SRV => 'SRV',
-            DNS_NAPTR => 'NAPTR',
-            DNS_AAAA => 'AAAA',
-            DNS_A6 => 'A6',
-            DNS_ANY => 'ANY',
-            DNS_ALL => 'ALL',
-            default => 'UNKNOWN',
-        };
+    protected function executeDig(
+        string $domain,
+        RecordType $recordType,
+        string $dnsProvider = '8.8.8.8',
+        int $timeout = 2
+    ): ?array {
+        $dnsType = strtoupper($recordType->getType());
+        $command = sprintf(
+            'dig @%s +noall +answer +time=%u %s %s',
+            escapeshellarg($dnsProvider),
+            $timeout,
+            escapeshellarg($dnsType),
+            escapeshellarg($domain)
+        );
+
+        exec($command, $output, $returnCode);
+        if ($returnCode !== 0 || empty($output)) {
+            return null;
+        }
+
+        return $recordType->transform($output);
     }
 }
