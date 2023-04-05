@@ -44,7 +44,7 @@ class ClientTest extends TestCase
             'type' => 'CUSTOM',
         ];
         $client = new Client();
-        $client->setFallback(function () use ($customRecord) {
+        $client->setCustomFallback(function () use ($customRecord) {
             return [$customRecord];
         });
 

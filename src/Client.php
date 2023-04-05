@@ -15,7 +15,7 @@ class Client implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    protected Closure|null $fallback = null;
+    protected Closure|null $customFallback = null;
 
     public function __construct()
     {
@@ -24,11 +24,11 @@ class Client implements LoggerAwareInterface
 
     /**
      * Set custom fallback function. To reset it, pass null.
-     * @param Closure|null $fallback
+     * @param Closure|null $customFallback
      */
-    public function setFallback(?Closure $fallback): void
+    public function setCustomFallback(?Closure $customFallback): void
     {
-        $this->fallback = $fallback;
+        $this->customFallback = $customFallback;
     }
 
     /**
@@ -78,8 +78,8 @@ class Client implements LoggerAwareInterface
      */
     protected function fallback(string $domain, int $type): array
     {
-        if ($this->fallback !== null) {
-            return ($this->fallback)($domain, $type);
+        if ($this->customFallback !== null) {
+            return ($this->customFallback)($domain, $type);
         }
 
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
