@@ -15,20 +15,15 @@ class Client implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    protected Closure|null $customFallback = null;
-
-    public function __construct()
-    {
-        $this->logger = new NullLogger();
-    }
+    protected Closure $fallback;
 
     /**
-     * Set custom fallback function. To reset it, pass null.
-     * @param Closure|null $customFallback
+     * @param Closure|null $fallback Fallback to use when dig fails. Should take two arguments: domain and type.
      */
-    public function setCustomFallback(?Closure $customFallback): void
+    public function __construct(Closure $fallback = null)
     {
-        $this->customFallback = $customFallback;
+        $this->logger = new NullLogger();
+        $this->fallback = $fallback ?? Closure::fromCallable([$this, 'defaultFallback']);
     }
 
     /**
@@ -37,7 +32,6 @@ class Client implements LoggerAwareInterface
      * @param string $dnsProvider
      * @param int $timeout
      * @return array
-     * @throws ErrorException
      */
     public function getRecord(string $domain, int $type, string $dnsProvider = '8.8.8.8', int $timeout = 2): array
     {
@@ -48,7 +42,7 @@ class Client implements LoggerAwareInterface
                 'domain' => $domain,
                 'type' => RecordTypeFactory::dnsTypeToName($type),
             ]);
-            return $this->fallback($domain, $type);
+            return ($this->fallback)($domain, $type);
         }
 
         $execState = $this->execEnabled();
@@ -58,7 +52,7 @@ class Client implements LoggerAwareInterface
                 'type' => $recordType->getType(),
                 'error' => $execState,
             ]);
-            return $this->fallback($domain, $type);
+            return ($this->fallback)($domain, $type);
         }
 
         $this->logger->debug('execute dig', ['domain' => $domain, 'type' => $recordType->getType()]);
@@ -76,12 +70,8 @@ class Client implements LoggerAwareInterface
      * @return array
      * @throws ErrorException
      */
-    protected function fallback(string $domain, int $type): array
+    protected function defaultFallback(string $domain, int $type): array
     {
-        if ($this->customFallback !== null) {
-            return ($this->customFallback)($domain, $type);
-        }
-
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
             // error was suppressed with the @-operator
             if (0 === error_reporting()) {
