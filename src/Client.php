@@ -74,7 +74,7 @@ class Client implements LoggerAwareInterface
 
         $this->logger->debug('execute dig', ['domain' => $domain, 'type' => $recordType->getType()]);
 
-        return $this->executeDig($domain, $recordType, $dnsProvider, $timeout);
+        return $this->executeDig($domain, $recordType, $dnsProvider, $timeout) ?? ($this->fallback)($domain, $type);
     }
 
     /**
@@ -154,7 +154,7 @@ class Client implements LoggerAwareInterface
         );
 
         exec($command, $output, $returnCode);
-        if ($returnCode !== 0 || empty($output)) {
+        if ($returnCode !== 0) {
             return null;
         }
 
