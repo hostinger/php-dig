@@ -6,6 +6,11 @@ namespace Hostinger\Dig;
 
 use Closure;
 use ErrorException;
+use Hostinger\Dig\Command\DigCommand;
+use Hostinger\Dig\Command\DigOptions;
+use Hostinger\Dig\Command\DigQuery;
+use Hostinger\Dig\Exceptions\DigExecException;
+use Hostinger\Dig\Exceptions\UnsupportedRecordTypeException;
 use Hostinger\Dig\RecordType\RecordType;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -75,6 +80,48 @@ class Client implements LoggerAwareInterface
         $this->logger->debug('execute dig', ['domain' => $domain, 'type' => $recordType->getType()]);
 
         return $this->executeDig($domain, $recordType, $dnsProvider, $timeout) ?? ($this->fallback)($domain, $type);
+    }
+
+    /**
+     * @param string $name
+     * @param int $type One of the DNS_* constants
+     * @param DigOptions|null $options
+     * @param DigQuery|null $query
+     * @return array
+     */
+    public function lookup(
+        string $name,
+        int $type,
+        ?DigOptions $options = null,
+        ?DigQuery $query = null,
+    ): array {
+        $recordTypeFactory = new RecordTypeFactory();
+        $recordType = $recordTypeFactory->make($type);
+
+        if (is_null($recordType)) {
+            throw new UnsupportedRecordTypeException($type);
+        }
+
+        $execState = $this->execEnabled();
+        if ($execState !== true) {
+            throw new DigExecException($execState);
+        }
+
+        $command = new DigCommand($name, strtoupper($recordType->getType()), $options, $query);
+        $cliCommand = $command->toCliCommand();
+
+        $this->logger->debug('executing dig lookup', [
+            'name' => $name,
+            'type' => $recordType->getType(),
+            'command' => $cliCommand,
+        ]);
+
+        exec($cliCommand, $output, $code);
+        if ($code !== 0) {
+            throw new DigExecException((string) $code);
+        }
+
+        return $recordType->transform($output);
     }
 
     /**
