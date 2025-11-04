@@ -25,7 +25,7 @@ class Client implements LoggerAwareInterface
     /**
      * @param Closure|null $customFallback Fallback to use when dig fails. Should take two arguments: domain and type.
      */
-    public function __construct(Closure $customFallback = null)
+    public function __construct(?Closure $customFallback = null)
     {
         $this->logger = new NullLogger();
         $this->fallback = $customFallback ?? Closure::fromCallable([$this, 'defaultFallback']);
@@ -51,11 +51,11 @@ class Client implements LoggerAwareInterface
     /**
      * @param string $domain
      * @param int $type One of the DNS_* constants
-     * @param string $dnsProvider
+     * @param string|null $dnsProvider
      * @param int $timeout
      * @return array
      */
-    public function getRecord(string $domain, int $type, string $dnsProvider = '8.8.8.8', int $timeout = 2): array
+    public function getRecord(string $domain, int $type, ?string $dnsProvider = null, int $timeout = 2): array
     {
         $recordTypeFactory = new RecordTypeFactory();
         $recordType = $recordTypeFactory->make($type);
@@ -188,13 +188,13 @@ class Client implements LoggerAwareInterface
     protected function executeDig(
         string $domain,
         RecordType $recordType,
-        string $dnsProvider = '8.8.8.8',
+        ?string $dnsProvider = null,
         int $timeout = 2
     ): ?array {
         $dnsType = strtoupper($recordType->getType());
         $command = sprintf(
-            'dig @%s +noall +answer +time=%u %s %s',
-            escapeshellarg($dnsProvider),
+            'dig%s +noall +answer +time=%u %s %s',
+            $dnsProvider ? ' @' . escapeshellarg($dnsProvider) : '',
             $timeout,
             escapeshellarg($dnsType),
             escapeshellarg($domain)
