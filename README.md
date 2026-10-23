@@ -7,7 +7,7 @@ It should drastically decrease time to get dns records, and lower failure errors
 
 ## Installation
 
-For now this package is not on [Packgist](https://packagist.org/), so you need to add it to your composer.json manually
+For now this package is not on [Packagist](https://packagist.org/), so you need to add it to your composer.json manually
 ```json
 {
     "repositories": [
