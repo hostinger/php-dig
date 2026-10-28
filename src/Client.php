@@ -161,7 +161,7 @@ class Client implements LoggerAwareInterface
     }
 
     /**
-     * Check if system allowed to execute commands. Return true or string with error message
+     * Check if the system is allowed to execute commands. Return true or string with error message
      * @return bool|string
      */
     protected function execEnabled(): bool|string
