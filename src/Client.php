@@ -192,8 +192,9 @@ class Client implements LoggerAwareInterface
         int $timeout = 2
     ): ?array {
         $dnsType = strtoupper($recordType->getType());
+        // Pass type and name via -t/-q so dig never parses them as options (e.g. "-f-" or "+foo").
         $command = sprintf(
-            'dig%s +noall +answer +time=%u %s %s',
+            'dig%s +noall +answer +time=%u -t %s -q %s',
             $dnsProvider ? ' @' . escapeshellarg($dnsProvider) : '',
             $timeout,
             escapeshellarg($dnsType),

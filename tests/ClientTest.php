@@ -55,6 +55,31 @@ class ClientTest extends TestCase
         $this->assertEquals('CUSTOM', $result[0]['type']);
     }
 
+    public function optionLikeNamesProvider(): array
+    {
+        return [
+            ['-f-'],
+            ['+foo'],
+            ['-fx'],
+            ['@x'],
+        ];
+    }
+
+    /**
+     * @dataProvider optionLikeNamesProvider
+     */
+    public function testGetRecordTreatsOptionLikeNamesAsLiterals(string $name): void
+    {
+        $fallbackCalled = false;
+        $client = new Client(function () use (&$fallbackCalled) {
+            $fallbackCalled = true;
+            return [];
+        });
+
+        $this->assertSame([], $client->getRecord($name, DNS_A));
+        $this->assertFalse($fallbackCalled, 'dig failed, so the name was likely parsed as an option');
+    }
+
     public function testLookupFailsOnUnsupportedRecordType(): void
     {
         $this->expectException(UnsupportedRecordTypeException::class);

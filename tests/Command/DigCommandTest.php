@@ -17,7 +17,7 @@ class DigCommandTest extends TestCase
                 'test.com',
                 'NS',
             ],
-            "dig 'test.com' 'NS'",
+            "dig -t 'NS' -q 'test.com'",
         ];
 
         yield 'with options' => [
@@ -28,7 +28,7 @@ class DigCommandTest extends TestCase
                     'ping.com',
                 ),
             ],
-            "dig '@ping.com' 'test.com' 'NS'",
+            "dig '@ping.com' -t 'NS' -q 'test.com'",
         ];
 
         yield 'with options and query' => [
@@ -45,7 +45,7 @@ class DigCommandTest extends TestCase
                     10,
                 ),
             ],
-            "dig '@ping.com' '+noall' '+answer' '+noauthority' '+time=10' 'test.com' 'NS'",
+            "dig '@ping.com' '+noall' '+answer' '+noauthority' '+time=10' -t 'NS' -q 'test.com'",
         ];
 
         yield 'escapes args' => [
@@ -53,7 +53,39 @@ class DigCommandTest extends TestCase
                 'test.com && exit 1',
                 'NS && ls -la',
             ],
-            "dig 'test.com && exit 1' 'NS && ls -la'",
+            "dig -t 'NS && ls -la' -q 'test.com && exit 1'",
+        ];
+
+        yield 'option-like name -f-' => [
+            [
+                '-f-',
+                'A',
+            ],
+            "dig -t 'A' -q '-f-'",
+        ];
+
+        yield 'option-like name +foo' => [
+            [
+                '+foo',
+                'A',
+            ],
+            "dig -t 'A' -q '+foo'",
+        ];
+
+        yield 'option-like name -fx' => [
+            [
+                '-fx',
+                'A',
+            ],
+            "dig -t 'A' -q '-fx'",
+        ];
+
+        yield 'option-like name @x' => [
+            [
+                '@x',
+                'A',
+            ],
+            "dig -t 'A' -q '@x'",
         ];
     }
 

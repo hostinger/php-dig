@@ -25,8 +25,9 @@ class DigCommand
             $args = array_merge($args, array_values($this->query->toCliQuery()));
         }
 
-        $args[] = escapeshellarg($this->name);
-        $args[] = escapeshellarg($this->type);
+        // Pass type and name via -t/-q so dig never parses them as options (e.g. "-f-" or "+foo").
+        $args[] = '-t ' . escapeshellarg($this->type);
+        $args[] = '-q ' . escapeshellarg($this->name);
 
         return join(' ', $args);
     }
